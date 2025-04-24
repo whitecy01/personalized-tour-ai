@@ -70,7 +70,7 @@ Instagram 해시태그 기반 리뷰 크롤링
 ## 폴더 구조(예정)
 
 ```bash
-📦 personalized-tour-ai
+personalized-tour-ai
 ├── 01_data_collection/       # 리뷰 수집 (Google Maps 등)
 ├── 02_data_cleaning/         # 전처리
 ├── 03_sentiment_analysis/    # 감정 분석 모델 추론
