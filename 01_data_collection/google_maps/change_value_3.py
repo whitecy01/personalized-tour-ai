@@ -8,8 +8,6 @@ FILE_PATH = os.getenv("FILE_PATH")
 # CSV 읽기
 df = pd.read_csv(FILE_PATH, encoding='utf-8-sig')
 
-time.sleep(100)
-
 # 조건: 사진유무 == "없음" AND 사용자총리뷰수이 비어 있거나 NaN
 condition = (df['사진유무'] == '없음') & (df['사용자총리뷰수'].isna() | (df['사용자총리뷰수'].astype(str).str.strip() == ''))
 

@@ -145,7 +145,7 @@ def run_collection():
                                 current_total = sum(1 for _ in f) - 1
                                 print(f"현재 저장된 총 리뷰 수: {current_total}개")
                     else:
-                        print("⚠️ 리뷰 없음")
+                        print("리뷰 없음")
                 except Exception as e:
                     print(f"오류 발생: {e}")
                 time.sleep(1)
