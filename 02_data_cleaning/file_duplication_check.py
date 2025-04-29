@@ -1,7 +1,7 @@
 import pandas as pd
 
 # CSV 파일 불러오기
-file_path = "/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/All_review.csv"
+file_path = "/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/01_data_collection/fin_data/All_reviews.csv"
 df = pd.read_csv(file_path)
 
 # 중복 검사 대상 컬럼

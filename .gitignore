@@ -5,5 +5,4 @@ google_maps_review.csv
 kakao_maps_review.csv
 All_review.csv
 
-# '원본' 폴더 내 특정 파일 무시
-원본/busan_reviews.csv
+01_data_collection/fin_data/*

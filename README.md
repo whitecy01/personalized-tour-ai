@@ -108,7 +108,8 @@ main               ← 최종 안정 버전
 </br>
 
 # 프로젝트 구조 및 설명
-### 01_data_collection
+<details>
+<summary><strong><span style="font-size: 18px;">01_data_collection</span></strong></summary>
 
 ```plaintext
 01_data_collection       
@@ -118,8 +119,10 @@ main               ← 최종 안정 버전
 │    ├── pharse_reviews_2.py
 │    └── change_value_3.py
 │
-└── kakao_maps_crawling_reviews
-     └── kakao_reviews.py
+└── kakao_maps
+│    └── kakao_reviews.py
+│
+└── fin_data(리뷰 데이터 완성)
 ```
 
 - google_maps
@@ -138,7 +141,7 @@ main               ← 최종 안정 버전
           - 수집된 리뷰 데이터 중 '사진유무' 값이 "없음"이고 '사용자 총리뷰수'가 비어있는 행을 찾아 0으로 수정
           - 리뷰를 미제공하는 곳이 있어서 이 처리를 진행
 
-- kakao_maps_crawling_reviews
+- kakao_maps
      - kakao_reviews.py
           - Selenium을 이용해 카카오맵에서 장소를 검색하고, 리뷰 데이터를 수집하여 CSV 파일로 저장하는 자동화 스크립트
           - 키워드 검색을 통해 특정 지역의 장소 검색
@@ -171,6 +174,18 @@ main               ← 최종 안정 버전
 19. 부산 온천장 카페
 20. 부산 반여동 카페
 21. 부산 일광 관광
+22. 부산 서면 맛집 
+23. 서면 관광
+24. 전포 카페
+25. 부산 포토존
+26. 부산 가볼만한곳
+27. 부산 데이트 코스
+28. 부산역 근처 맛집
+29. 흰여울문화마을 포토존
+30. 감천문화마을 카페
+31. 태종대 볼거리
+32. 광안리 카페
+33. 송정 해수욕장 맛집
 ```
 
 
@@ -191,11 +206,48 @@ main               ← 최종 안정 버전
 | 총평점             | 장소의 전체 평균 별점                      |
 | 업종               | 업종명 (예: 카페, 음식점 등)               |
 | 사용자총리뷰수     | 리뷰 작성자의 누적 리뷰 수                 |
+</details>
 
-### 02_data_cleaning
-- kakao_maps_reviews.csv을 google_maps_reviews.csv 규격 맞추기
-- kakao_maps_reviews.csv의 데이터 전처리
+<details>
+<summary><strong><span style="font-size: 18px;">02_data_cleaning</span></strong></summary>
 
+```plaintext
+02_data_cleaning       
+└── google_maps_review_time_change.py        
+└── kakao_maps_reivew_change_newline.py
+└── Industry_check.py
+└── file_duplication_check.py
+```
+
+1. kakao_maps_reviews.csv를 기반으로 google_maps_reviews.csv 파일 규격 맞추기
+2. google_maps_reivew 작성시간 맞추기 
+
+> google_maps_review_time_change.py
+> 
+3. kakao_maps_reviews.csv의 리뷰 내용에서 “\n” →  “ “으로 변경
+
+> kakao_maps_reivew_change_newline.py
+> 
+4. 두개 파일 합치기
+    - kakao_maps_reviews를 복사해서 All_reivew.csv로 만듦
+    - 합친 두 개의 파일 중복 검사
+5. 업종 없으면 “없음”으로 변경
+
+> Industry_check.py
+> 
+
+### 주의 사항(이건 데이터 크롤링할 때 이렇게 진행)
+
+- 리뷰 내용이 없으면 “리뷰 없음”
+- 사용자 사진 유무 “없음” and 사용자총리뷰수 “비공개”
+    - 전부 0, 0 으로 처리
+
+6. 중복 검사
+> file_duplication_check.py
+>
+
+
+</details>
 
 ### 03_sentiment_analysis
 - 리뷰데이터 점수 벡터화
