@@ -1,22 +1,17 @@
 import pandas as pd
 from datetime import datetime
-from sentiment_analysis import get_sentiment_score_safe as get_sentiment_score
 import time
 from tqdm import tqdm
+import os
 
 
-
-file_path = "/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/All_review.csv"
+# file_path = "/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/All_review.csv"
+file_path = "C:/Users/NM333-67/Desktop/personalized-tour-ai/All_reviews_second.csv"
 df = pd.read_csv(file_path)
 
-# 감정 분석 -> tqdm 적용을 위해 리뷰내용 리스트화
-reviews = df["리뷰내용"].astype(str).tolist()
-
 #1. 리뷰 길이 ----------------------------------------------------------------------
-# df["리뷰내용"] = df["리뷰내용"].astype(str).str.replace("\n", " ").str.strip()
-
-df["리뷰_길이"] = df["리뷰내용"].astype(str).apply(len)
-def score_length(length):
+def score_length(text):
+    length = len(str(text))
     if length >= 300:
         return 1.0
     elif length <= 100:
@@ -24,7 +19,8 @@ def score_length(length):
     else:
         return (length - 100) / 200  # 100~300 사이 선형 증가
 
-df["리뷰길이_점수"] = df["리뷰_길이"].apply(score_length)
+df["리뷰길이_점수"] = df["리뷰내용"].apply(score_length)
+
 
 print("리뷰_길이 컬럼이 추가된 파일이 저장")
 
@@ -76,19 +72,6 @@ print("날짜_최신성_점수 컬럼 생성 완료")
 # 사진유무 값만 가져오기
 photo_values = df["사진유무"]
 
-# 5. 감정분석 -------------------------------------------------------
-print("감정 분석 중...")
-scores = []
-
-for i, text in enumerate(reviews):
-    print(f"\n[{i+1}/{len(reviews)}] 리뷰 내용:\n{text}")
-    score = get_sentiment_score(text)
-    print(f"감정 점수: {score}")
-    scores.append(score)
-    time.sleep(5)
-# df["감정점수"] = [get_sentiment_score(text) for text in tqdm(reviews)]
-
-
 
 # 저장
-df.to_csv("All_review.csv", index=False, encoding="utf-8-sig")
+df.to_csv("All_reviews_second.csv", index=False, encoding="utf-8-sig")

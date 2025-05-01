@@ -3,6 +3,20 @@
 # CSV 파일 무시
 google_maps_review.csv
 kakao_maps_review.csv
-All_review.csv
+All_reviews.csv
+All_reviews_04_trust_score.csv
+
 
 01_data_collection/fin_data/*
+
+
+# 03_sentiment_analysis
+03_sentiment_analysis/finetuned/results
+03_sentiment_analysis/finetuned/klue-roberta-nsmc-finetuned
+03_sentiment_analysis/finetuned/klue-roberta-nsmc-finetuned.zip
+
+# 04_trust_score_model
+04_trust_score_model/xgb_trust_model.pkl
+
+# 05_vector_DB
+05_vector_db/chroma_storage
