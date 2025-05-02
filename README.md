@@ -71,16 +71,16 @@ Instagram 해시태그 기반 리뷰 크롤링
 
 ```bash
 personalized-tour-ai
-├── 01_data_collection/       # 리뷰 수집 (Google Maps 등)
-├── 02_data_cleaning/         # 전처리
-├── 03_sentiment_analysis/    # 감정 분석 모델 추론
-├── 04_trust_score_model/     # 정량화 + XGBoost
-├── 05_vector_db/             # FAISS / Chroma 저장
-├── 06_rag_pipeline/          # RAG 응답 구조
-├── 07_llm_response/          # GPT 응답 생성
-├── 08_front_ui_mockup/       # 시각화 결과 예시
-├── 09_docs/                  # 보고서, 다이어그램
-├── image                     # README 사진 
+├── 01_data_collection/            # 리뷰 수집 (Google Maps 등)
+├── 02_data_cleaning/              # 전처리
+├── 03_sentiment_analysis/         # 감정 분석 모델 추론
+├── 04_trust_score_model/          # 정량화 + XGBoost
+├── 05_vector_db/                  # FAISS / Chroma 저장
+├── 06_front_backend_rag_pipeline/ # RAG 응답 구조
+├── 07_llm_response/               # GPT 응답 생성
+├── 08_front_ui_mockup/            # 시각화 결과 예시
+├── 09_docs/                       # 보고서, 다이어그램
+├── image                          # README 사진 
 └── README.md
 ```
 
