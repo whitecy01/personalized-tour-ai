@@ -60,3 +60,23 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+expo-env.d.ts
+
+#spring boot
+# Gradle
+.gradle/
+build/
+out/
+
+# IntelliJ
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Sensitive configs
+/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/06_front_backend_rag_pipeline/backend_app/src/main/resources/application.properties
+/backend_app/src/main/resources/application.properties

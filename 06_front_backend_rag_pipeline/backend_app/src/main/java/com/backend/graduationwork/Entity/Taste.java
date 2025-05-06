@@ -1,2 +1,15 @@
-package com.backend.graduationwork.Entity;public class Taste {
+package com.backend.graduationwork.Entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+
+@Entity
+@Getter
+@Table(name = "tastes")
+public class Taste {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
 }

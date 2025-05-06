@@ -3,6 +3,7 @@ import { useState } from 'react';
 import DropdownSelector from '../../components/DropdownSelector';
 import PickerModal from '../../components/PickerModal';
 import { TouchableOpacity } from 'react-native';
+import axios from 'axios';
 
 type CheckItemMap = { [key: string]: boolean };
 
@@ -35,7 +36,9 @@ export default function NewQueryScreen() {
   const [amenitiesItemsLocation, setCheckedItemsAmenities] = useState<CheckItemMap>({});
 
   //최우선 조건
-  const [priorityItemsLocation, setCheckedItemsPriority] = useState<CheckItemMap>({});
+  // const [priorityItemsLocation, setCheckedItemsPriority] = useState<CheckItemMap>({});1
+  const [selectedPriority, setSelectedPriority] = useState('');
+
   
 
 
@@ -74,12 +77,12 @@ export default function NewQueryScreen() {
     }));
   };
 
-  const priorityToggleCheck = (key: string) => {
-    setCheckedItemsPriority((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
+  // const priorityToggleCheck = (key: string) => {
+  //   setCheckedItemsPriority((prev) => ({
+  //     ...prev,
+  //     [key]: !prev[key],
+  //   }));
+  // };
 
   
 
@@ -251,7 +254,23 @@ export default function NewQueryScreen() {
 
       {/* 최우선 조건 */}
       <Text style={styles.sectionTitle_four}>7. 최우선 조건을 입력해주세요</Text>
-      <Text style={styles.subNote}>복수선택 가능</Text>
+      <View style={styles.checkboxRow}>
+        {['동행 유형', '가격', '음식', '분위기'].map((item) => (
+          <TouchableOpacity
+            key={item}
+            style={styles.circleItem}
+            onPress={() => setSelectedPriority(item)}  // 하나만 선택
+          >
+            <View style={[
+              styles.circle,
+              selectedPriority === item && styles.circleChecked  // 선택 표시
+            ]} />
+            <Text style={styles.circleLabel}>{item}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* <Text style={styles.sectionTitle_four}>7. 최우선 조건을 입력해주세요</Text>
       <View style={styles.checkboxRow}>
         {['동행 유형','가격','음식','분위기'].map((item) => (
           <TouchableOpacity
@@ -266,14 +285,14 @@ export default function NewQueryScreen() {
             <Text style={styles.circleLabel}>{item}</Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </View> */}
 
 
 
       {/* 완료 버튼 */}
       <TouchableOpacity
         style={styles.customButton}
-        onPress={() => {
+        onPress={async () => {
           const selectedInterests = Object.keys(interestCheckedItems).filter(
             (key) => interestCheckedItems[key]
           );
@@ -306,9 +325,9 @@ export default function NewQueryScreen() {
           );
       
           // 최우선 조건
-          const selectedPriorities = Object.keys(priorityItemsLocation).filter(
-            (key) => priorityItemsLocation[key]
-          );
+          // const selectedPriorities = Object.keys(priorityItemsLocation).filter(
+          //   (key) => priorityItemsLocation[key]
+          // );
       
           console.log('=== 선택된 값들 ===');
           console.log('나이:', selectedAge);
@@ -320,7 +339,35 @@ export default function NewQueryScreen() {
           console.log('음식 취향:', selectedTastes);
           console.log('방문 희망 지역:', selectedLocations);
           console.log('기타 편의 사항:', selectedAmenities);
-          console.log('최우선 조건:', selectedPriorities);
+          // console.log('최우선 조건:', selectedPriorities);
+          console.log('최우선 조건:', selectedPriority);
+          // api 요청 코드
+          const requestBody = {
+            userId: 1, // 예: 테스트용 userId, 실제 로그인 연동 시 교체
+            gender: selectedGender,
+            age: selectedAge,
+            friendType: selectedfrined,
+            purposes: selectedPurposes,
+            interest: selectedInterests,
+            taste: selectedTastes,
+            location: selectedLocations,
+            amenity: selectedAmenities,
+            // prioritie: selectedPriorities,
+            priority: selectedPriority,
+          };
+          console.log(requestBody);
+          try {
+            const response = await axios.post(
+              'http://192.168.1.193:8080/queries/create',
+              requestBody
+            );
+            console.log('서버 응답:', response.data);
+            alert('저장이 완료되었습니다!');
+          } catch (error) {
+            console.error('저장 중 오류 발생:', error);
+            alert('저장 중 오류가 발생했습니다.');
+          }
+
         }}
       >
         <Text style={styles.customButtonText}>완료</Text>

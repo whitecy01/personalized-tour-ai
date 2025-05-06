@@ -9,8 +9,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SignupResponse {
+public class UserResponse {
+    private Long Id;
     private String userId;
     private String password;
+
+
 
 }

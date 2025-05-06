@@ -1,4 +1,4 @@
-package com.backend.graduationwork.DTO;
+package com.backend.graduationwork.RequestDto;
 
 
 import lombok.AllArgsConstructor;
@@ -12,5 +12,7 @@ import lombok.Setter;
 @Setter
 public class SignupRequest {
 
-    private String userId
+    private String userId;
+    private String password;
+
 }
