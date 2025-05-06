@@ -80,3 +80,4 @@ Thumbs.db
 # Sensitive configs
 /Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/06_front_backend_rag_pipeline/backend_app/src/main/resources/application.properties
 /backend_app/src/main/resources/application.properties
+**/application.properties
