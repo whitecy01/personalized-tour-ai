@@ -1,0 +1,83 @@
+.env
+
+# CSV 파일 무시
+google_maps_review.csv
+kakao_maps_review.csv
+All_reviews.csv
+All_reviews_04_trust_score.csv
+
+
+01_data_collection/fin_data/*
+
+
+# 03_sentiment_analysis
+03_sentiment_analysis/finetuned/results
+03_sentiment_analysis/finetuned/klue-roberta-nsmc-finetuned
+03_sentiment_analysis/finetuned/klue-roberta-nsmc-finetuned.zip
+
+# 04_trust_score_model
+04_trust_score_model/xgb_trust_model.pkl
+
+# 05_vector_DB
+05_vector_db/chroma_storage
+
+
+## front-app
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+expo-env.d.ts
+
+#spring boot
+# Gradle
+.gradle/
+build/
+out/
+
+# IntelliJ
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Sensitive configs
+/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/06_front_backend_rag_pipeline/backend_app/src/main/resources/application.properties
+/backend_app/src/main/resources/application.properties
+**/application.properties

@@ -70,17 +70,17 @@ Instagram 해시태그 기반 리뷰 크롤링
 ## 폴더 구조(예정)
 
 ```bash
-📦 personalized-tour-ai
-├── 01_data_collection/       # 리뷰 수집 (Google Maps 등)
-├── 02_data_cleaning/         # 전처리, 중복 제거
-├── 03_sentiment_analysis/    # 감정 분석 모델 추론
-├── 04_trust_score_model/     # 정량화 + XGBoost
-├── 05_vector_db/             # FAISS / Chroma 저장
-├── 06_rag_pipeline/          # RAG 응답 구조
-├── 07_llm_response/          # GPT 응답 생성
-├── 08_front_ui_mockup/       # 시각화 결과 예시
-├── 09_docs/                  # 보고서, 다이어그램
-├── image                     # README 사진 
+personalized-tour-ai
+├── 01_data_collection/            # 리뷰 수집 (Google Maps 등)
+├── 02_data_cleaning/              # 전처리
+├── 03_sentiment_analysis/         # 감정 분석 모델 추론
+├── 04_trust_score_model/          # 정량화 + XGBoost
+├── 05_vector_db/                  # FAISS / Chroma 저장
+├── 06_front_backend_rag_pipeline/ # RAG 응답 구조
+├── 07_llm_response/               # GPT 응답 생성
+├── 08_front_ui_mockup/            # 시각화 결과 예시
+├── 09_docs/                       # 보고서, 다이어그램
+├── image                          # README 사진 
 └── README.md
 ```
 
@@ -102,3 +102,153 @@ main               ← 최종 안정 버전
      ├── 08_front_ui_mockup
      └── 09_docs
 ```
+
+ 
+
+</br>
+
+# 프로젝트 구조 및 설명
+<details>
+<summary><strong><span style="font-size: 18px;">01_data_collection</span></strong></summary>
+
+```plaintext
+01_data_collection       
+│
+└── google_maps        
+│    ├── google_reivews_api_1.py
+│    ├── pharse_reviews_2.py
+│    └── change_value_3.py
+│
+└── kakao_maps
+│    └── kakao_reviews.py
+│
+└── fin_data(리뷰 데이터 완성)
+```
+
+- google_maps
+     - google_reivews_api_1.py
+          - Google Places API를 활용해 장소 및 리뷰 데이터를 수집
+          - google_maps_reviews.csv로 결과 저장
+          - 부산 내 각 구별 위치좌표 및 키워드를 기반으로 장소 검색
+          - 장소의 place_id를 활용하여 상세 리뷰 정보 요청
+          - 중복 리뷰 필터링 처리
+     - pharse_reviews_2.py
+          - 수집된 구글 리뷰 데이터를 Selenium으로 접속하여 추가 정보(총리뷰 수, 업종, 총별점, 사진 유무 등)를 수집
+          - 장소명과 일치하는 리뷰 블럭을 찾아 클릭 후 상세 정보 추출
+          - 스크롤을 통해 리뷰 영역을 탐색하며 사용자 상세 리뷰 정보를 보강
+          - 추출 정보는 기존 CSV(google_maps_reviews.csv)에 반영
+     - change_value_3.py
+          - 수집된 리뷰 데이터 중 '사진유무' 값이 "없음"이고 '사용자 총리뷰수'가 비어있는 행을 찾아 0으로 수정
+          - 리뷰를 미제공하는 곳이 있어서 이 처리를 진행
+
+- kakao_maps
+     - kakao_reviews.py
+          - Selenium을 이용해 카카오맵에서 장소를 검색하고, 리뷰 데이터를 수집하여 CSV 파일로 저장하는 자동화 스크립트
+          - 키워드 검색을 통해 특정 지역의 장소 검색
+          - 검색 결과 리스트의 각 장소를 순차적으로 클릭하여 리뷰 페이지 진입
+          - 각 장소의 리뷰들을 스크립를 통해 모두 로딩한 후 항목 추출(장소명, 업종, 주소, 총평점, 리뷰 작성자명, 리뷰 본문, 별점, 작성일, 사진 유무, 작성자 리뷰수, 리뷰 링크)
+          - 중복 방지 로직을 통해 이미 저장된 데이터는 필터링
+          - 수집된 리뷰 데이터는 kakao_maps_reviews.csv로 저장
+</br>         
+
+카카오맵 maps_crwaling_reviews 키워드
+```plaintext
+1. 해운대 맛집 
+2. 부산 관광 
+3. 사하구 디저트 카페 
+4. 영도구 맛집 
+5. 부산 남구 카페 
+6. 부산 북구 놀거리
+7. 부산 북구 관광 
+8. 부산 전통시장 
+9. 부산 연제구 관광
+10. 부산 기장 맛집 
+11. 부산 냉정 카페
+12. 부산 주례 맛집
+13. 부산 구서동 맛집
+14. 부산 정관 카페
+15. 부산 하단 카페
+16. 부산 대연동 디저트
+17. 부산 명장동 골목식당
+18. 부산 서면 카페
+19. 부산 온천장 카페
+20. 부산 반여동 카페
+21. 부산 일광 관광
+22. 부산 서면 맛집 
+23. 서면 관광
+24. 전포 카페
+25. 부산 포토존
+26. 부산 가볼만한곳
+27. 부산 데이트 코스
+28. 부산역 근처 맛집
+29. 흰여울문화마을 포토존
+30. 감천문화마을 카페
+31. 태종대 볼거리
+32. 광안리 카페
+33. 송정 해수욕장 맛집
+```
+
+
+
+
+### 수집 데이터 필드 설명
+
+| 필드명             | 설명                                       |
+|--------------------|--------------------------------------------|
+| 가게명             | 장소 이름                                  |
+| 주소               | 장소 주소                                  |
+| 작성자             | 리뷰 작성자 이름                           |
+| 리뷰내용           | 작성된 리뷰 내용                           |
+| 별점               | 개별 리뷰 별점                             |
+| 작성시간           | 리뷰가 작성된 상대 시간 (예: 1일 전 등)    |
+| 리뷰 페이지        | 리뷰 상세 페이지 URL                       |
+| 사진유무           | 해당 리뷰에 사진 포함 여부 (1: 있음 / 0: 없음) |
+| 총평점             | 장소의 전체 평균 별점                      |
+| 업종               | 업종명 (예: 카페, 음식점 등)               |
+| 사용자총리뷰수     | 리뷰 작성자의 누적 리뷰 수                 |
+</details>
+
+<details>
+<summary><strong><span style="font-size: 18px;">02_data_cleaning</span></strong></summary>
+
+```plaintext
+02_data_cleaning       
+└── google_maps_review_time_change.py        
+└── kakao_maps_reivew_change_newline.py
+└── Industry_check.py
+└── file_duplication_check.py
+```
+
+1. kakao_maps_reviews.csv를 기반으로 google_maps_reviews.csv 파일 규격 맞추기
+2. google_maps_reivew 작성시간 맞추기 
+
+> google_maps_review_time_change.py
+> 
+3. kakao_maps_reviews.csv의 리뷰 내용에서 “\n” →  “ “으로 변경
+
+> kakao_maps_reivew_change_newline.py
+> 
+4. 두개 파일 합치기
+    - kakao_maps_reviews를 복사해서 All_reivew.csv로 만듦
+    - 합친 두 개의 파일 중복 검사
+5. 업종 없으면 “없음”으로 변경
+
+> Industry_check.py
+> 
+
+### 주의 사항(이건 데이터 크롤링할 때 이렇게 진행)
+
+- 리뷰 내용이 없으면 “리뷰 없음”
+- 사용자 사진 유무 “없음” and 사용자총리뷰수 “비공개”
+    - 전부 0, 0 으로 처리
+
+6. 중복 검사
+> file_duplication_check.py
+>
+
+
+</details>
+
+### 03_sentiment_analysis
+- 리뷰데이터 점수 벡터화
+- 감정 분석 모델 추론
