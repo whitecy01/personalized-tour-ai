@@ -19,7 +19,16 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="query_detail" options={{ headerShown: true, headerBackTitle: '뒤로가기',  title: '사전 질의'}} />
+        <Stack.Screen
+          name="chat"
+          options={{
+            headerShown: true,
+            headerBackTitle: '목록으로',  
+            title: '채팅방',          
+          }}
+        />
       </Stack>
+      
       <StatusBar style="auto" />
     </ThemeProvider>
   );
