@@ -5,6 +5,7 @@ google_maps_review.csv
 kakao_maps_review.csv
 All_reviews.csv
 All_reviews_04_trust_score.csv
+All_reviews_04_trust_score_V2.csv
 
 
 01_data_collection/fin_data/*
@@ -20,6 +21,7 @@ All_reviews_04_trust_score.csv
 
 # 05_vector_DB
 05_vector_db/chroma_storage
+05_vector_db/chroma_storageV2
 
 
 ## front-app

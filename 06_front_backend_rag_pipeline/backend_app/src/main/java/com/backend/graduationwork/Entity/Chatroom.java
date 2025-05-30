@@ -26,7 +26,7 @@ public class Chatroom {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;  // 생성한 사용자
+    private Users user;  // 생성한 사용자
 
 
 }

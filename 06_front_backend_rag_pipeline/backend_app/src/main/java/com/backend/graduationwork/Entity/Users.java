@@ -4,17 +4,14 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.Id;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "user")
+@Table(name = "users")
 @AllArgsConstructor
-public class User {
+public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,15 +24,15 @@ public class User {
     private String password;
 
 
-    private User() {};
+    private Users() {};
 
-    public User(String userId, String password) {
+    public Users(String userId, String password) {
         this.userId = userId;
         this.password = password;
     }
 
-    public static User of(String userId, String password){
-        return new User(userId,password);
+    public static Users of(String userId, String password){
+        return new Users(userId,password);
     }
 
 //    // 연관관계

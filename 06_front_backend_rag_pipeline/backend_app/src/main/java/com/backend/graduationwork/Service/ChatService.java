@@ -7,6 +7,7 @@ import com.backend.graduationwork.Repository.QueryRepository;
 import com.backend.graduationwork.Repository.UserRepository;
 import com.backend.graduationwork.ResponseDto.ChatmessageLLMRequest;
 import com.backend.graduationwork.ResponseDto.ChatroomResponse;
+import com.backend.graduationwork.ResponseDto.LLMQueryRequest;
 import com.backend.graduationwork.ResponseDto.QuerySelectResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class ChatService {
 
     public ResponseEntity<ChatmessageLLMRequest> sendMessage(Long roomId, Long userId, String messageText) {
         Chatroom room = chatroomRepository.findById(roomId).orElseThrow();
-        User user = userRepository.findById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 사용자 메시지 저장
@@ -51,17 +52,11 @@ public class ChatService {
         Query query = queryRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Query not found"));
 
-        QuerySelectResponse response = new QuerySelectResponse(
+        LLMQueryRequest response = new LLMQueryRequest(
                 query.getId(),
                 query.getAge(),
-                query.getGender(),
                 query.getFriendType(),
-                query.getPurposes().stream().map(Purpose::getName).toList(),
-                query.getInterests().stream().map(Interest::getName).toList(),
-                query.getTastes().stream().map(Taste::getName).toList(),
-                query.getLocations().stream().map(Location::getName).toList(),
-                query.getAmenities().stream().map(Amenity::getName).toList(),
-                query.getPriorities()
+                query.getPurposes().stream().map(Purpose::getName).toList()
         );
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -70,10 +65,7 @@ public class ChatService {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-
-
-
-
+        
 //        String llmResponse = callLLM(messageText);
         String llmResponse = callLLM(response, messageText);
 
@@ -90,12 +82,12 @@ public class ChatService {
         return ResponseEntity.ok(chatmessageLLMRequest);
     }
 
-//    private String callLLM(String prompt) {
-//        // 실제 LLM 호출 로직 (예: OpenAI API 호출)
-//        return "임시 응답: " + prompt + "에 대한 답변입니다.";
-//    }
+    private String callLLM(String prompt) {
+        // 실제 LLM 호출 로직 (예: OpenAI API 호출)
+        return "임시 응답: " + prompt + "에 대한 답변입니다.";
+    }
 
-    private String callLLM(QuerySelectResponse response, String userMessage) {
+    private String callLLM(LLMQueryRequest response, String userMessage) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -123,7 +115,7 @@ public class ChatService {
 
 
     public ResponseEntity<List<ChatroomResponse>> getUserChatrooms(Long userId) {
-        User user = userRepository.findById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         List<Chatroom> rooms = chatroomRepository.findByUser(user);
@@ -144,7 +136,7 @@ public class ChatService {
 
     //채팅방 생성
     public ResponseEntity<ChatroomResponse> createChatroom(Long userId) {
-        User user = userRepository.findById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         Chatroom chatroom = new Chatroom();

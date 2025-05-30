@@ -1,11 +1,11 @@
 package com.backend.graduationwork.Repository;
 
-import com.backend.graduationwork.Entity.User;
+import com.backend.graduationwork.Entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<Users, Long> {
     // userId와 password가 일치하는 사용자 찾기
-    Optional<User> findByUserIdAndPassword(String userId, String password);
+    Optional<Users> findByUserIdAndPassword(String userId, String password);
 }

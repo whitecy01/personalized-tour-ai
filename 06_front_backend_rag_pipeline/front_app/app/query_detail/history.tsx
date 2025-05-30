@@ -3,16 +3,16 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-nativ
 import axios from 'axios';
 
 type QueryResponse = {
-  id: number;
+  queryId: number;
   age: string;
-  gender: string;
   friendType: string;
+  reviewLength: number;
+  reviewCountPreference: number;
+  photoPreference: number;
+  recentnessPreference: number;
+  sentimentPreference: number;
+  trustScoreThreshold: number;
   purposes: string[];
-  interests: string[];
-  tastes: string[];
-  locations: string[];
-  amenities: string[];
-  priorities: string;
 };
 
 export default function QueryHistoryScreen() {
@@ -26,6 +26,7 @@ export default function QueryHistoryScreen() {
         const response = await axios.get<QueryResponse>(
           `http://192.168.1.193:8080/queries/${userId}`
         );
+        console.log(response.data)
         setQueryData(response.data);
       } catch (error) {
         console.error('데이터 불러오기 실패:', error);
@@ -52,20 +53,55 @@ export default function QueryHistoryScreen() {
       </View>
     );
   }
+    const reviewLengthMap = ['없음', '짧고 간결한 리뷰', '적당한 길이의 리뷰', '자세하고 길게 작성된 리뷰'];
+  const reviewCountMap = ['없음', '상관없음', '리뷰 수가 적어도 내용이 좋다면 신뢰함', '리뷰를 많이 작성한 사용자'];
+  const photoMap = ['없음', '아니오', '예'];
+  const recentnessMap = ['없음', '오래된 리뷰도 상관없다', '그렇다'];
+  const sentimentMap = ['없음', '아니다', '중립적이다', '그렇다'];
+
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>사전 질의 내역</Text>
       <Text>나이: {queryData.age}</Text>
-      <Text>성별: {queryData.gender}</Text>
       <Text>동행 유형: {queryData.friendType}</Text>
 
       <Section title="여행 목적" data={queryData.purposes} />
-      <Section title="관심사" data={queryData.interests} />
-      <Section title="음식 취향" data={queryData.tastes} />
-      <Section title="방문 희망 지역" data={queryData.locations} />
-      <Section title="기타 편의 사항" data={queryData.amenities} />
-      <Section title="최우선 조건" data={[queryData.priorities]} />
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>개인화 질문 응답</Text>
+        <View style={styles.itemRow}>
+          <Text style={styles.bullet}>•</Text>
+          <Text style={styles.itemLabel}>리뷰 길이 선호:</Text>
+          <Text style={styles.itemValue}>{reviewLengthMap[queryData.reviewLength]}</Text>
+        </View>
+        <View style={styles.itemRow}>
+          <Text style={styles.bullet}>•</Text>
+          <Text style={styles.itemLabel}>리뷰 작성자 활동성:</Text>
+          <Text style={styles.itemValue}>{reviewCountMap[queryData.reviewCountPreference]}</Text>
+        </View>
+        <View style={styles.itemRow}>
+          <Text style={styles.bullet}>•</Text>
+          <Text style={styles.itemLabel}>사진 포함 여부:</Text>
+          <Text style={styles.itemValue}>{photoMap[queryData.photoPreference]}</Text>
+        </View>
+        <View style={styles.itemRow}>
+          <Text style={styles.bullet}>•</Text>
+          <Text style={styles.itemLabel}>리뷰 최신성:</Text>
+          <Text style={styles.itemValue}>{recentnessMap[queryData.recentnessPreference]}</Text>
+        </View>
+        <View style={styles.itemRow}>
+          <Text style={styles.bullet}>•</Text>
+          <Text style={styles.itemLabel}>긍정 리뷰 선호도:</Text>
+          <Text style={styles.itemValue}>{sentimentMap[queryData.sentimentPreference]}</Text>
+        </View>
+        <View style={styles.itemRow}>
+          <Text style={styles.bullet}>•</Text>
+          <Text style={styles.itemLabel}>신뢰 점수 기준:</Text>
+          <Text style={styles.itemValue}>{Math.round(queryData.trustScoreThreshold * 100)}%</Text>
+        </View>
+      </View>
+
     </View>
   );
 }
@@ -92,6 +128,27 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   section: { marginTop: 15 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 5 },
+  itemRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 6,
+  flexWrap: 'wrap',
+  },
+  bullet: {
+    fontSize: 16,
+    marginRight: 6,
+    color: '#7dbdf5',
+  },
+  itemLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginRight: 4,
+    color: '#333',
+  },
+  itemValue: {
+    fontSize: 15,
+    color: '#555',
+  },
 });
 
 

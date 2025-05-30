@@ -1,13 +1,18 @@
 package com.backend.graduationwork.Service;
 
 import com.backend.graduationwork.Entity.*;
+import com.backend.graduationwork.Entity.Purpose;
 import com.backend.graduationwork.Repository.*;
 import com.backend.graduationwork.RequestDto.QueryRequest;
+import com.backend.graduationwork.RequestDto.TrustScoreUpdateRequest;
 import com.backend.graduationwork.ResponseDto.QuerySelectResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,71 +27,101 @@ public class QueryService {
     @Autowired
     private PurposeRepository purposeRepository;
 
-    @Autowired
-    private InterestRepository interestRepository;
-
-    @Autowired
-    private TasteRepository tasteRepository;
-
-    @Autowired
-    private LocationRepository locationRepository;
-
-    @Autowired
-    private AmenityRepository amenityRepository;
 
     public ResponseEntity<QueryRequest> createQuery(QueryRequest request) {
-        User user = userRepository.findById(request.getUserId())
+        Users users = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 기존 Query 찾기 (user 기준)
-        Optional<Query> existingQueryOpt = queryRepository.findByUser(user);
+        Optional<Query> existingQueryOpt = queryRepository.findByUser(users);
 
         Query query = existingQueryOpt.orElse(new Query());
-        query.setUser(user);
+        query.setUser(users);
         query.setAge(request.getAge());
-        query.setGender(request.getGender());
         query.setFriendType(request.getFriendType());
-        // 6. 최우선 조건
-        query.setPriorities(request.getPriority());
+        query.setReviewLength(request.getReviewLength());
+        query.setReviewCountPreference(request.getReviewCountPreference());
+        query.setPhotoPreference(request.getPhotoPreference());
+        query.setRecentnessPreference(request.getRecentnessPreference());
+        query.setSentimentPreference(request.getSentimentPreference());
+        query.setTrustScoreThreshold(request.getTrustScoreThreshold());
 
         // 1. 여행 목적
         List<Purpose> purposes = purposeRepository.findByNameIn(request.getPurposes());
         query.setPurposes(purposes);
 
-        // 2. 관심사
-        List<Interest> interest = interestRepository.findByNameIn(request.getInterest());
-        query.setInterests(interest);
-
-        // 3. 음식 취향
-        List<Taste> taste = tasteRepository.findByNameIn(request.getTaste());
-        query.setTastes(taste);
-
-        // 4. 방문 희망 지역
-        List<Location> location = locationRepository.findByNameIn(request.getLocation());
-        query.setLocations(location);
-
-        // 5. 기타 편의 사항
-        List<Amenity> amenities = amenityRepository.findByNameIn(request.getAmenity());
-        query.setAmenities(amenities);
-
         queryRepository.save(query);
+
+        // Python 서버에 요청
+        RestTemplate restTemplate = new RestTemplate();
+        // 원본 값 (0이면 기본값으로 대체)
+        double reviewLength = request.getReviewLength() > 0 ? request.getReviewLength() : 0.2;
+        double reviewCount = request.getReviewCountPreference() > 0 ? request.getReviewCountPreference() : 0.3;
+        double sentiment = request.getSentimentPreference() > 0 ? request.getSentimentPreference() : 0.25;
+        double photo = request.getPhotoPreference() > 0 ? request.getPhotoPreference() : 0.2;
+        double recentness = request.getRecentnessPreference() > 0 ? request.getRecentnessPreference() : 0.05;
+
+        // 정규화
+        double total = reviewLength + reviewCount + sentiment + photo + recentness;
+        double normalizedReviewLength = reviewLength / total;
+        double normalizedReviewCount = reviewCount / total;
+        double normalizedSentiment = sentiment / total;
+        double normalizedPhoto = photo / total;
+        double normalizedRecentness = recentness / total;
+        System.out.println("정규화 후 가중치:");
+        System.out.println("reviewLength = " + normalizedReviewLength);
+        System.out.println("reviewCount = " + normalizedReviewCount);
+        System.out.println("sentiment = " + normalizedSentiment);
+        System.out.println("photo = " + normalizedPhoto);
+        System.out.println("recentness = " + normalizedRecentness);
+
+        TrustScoreUpdateRequest updateRequest = new TrustScoreUpdateRequest(
+                normalizedReviewLength,
+                normalizedReviewCount,
+                normalizedSentiment,
+                normalizedPhoto,
+                normalizedRecentness,
+                request.getTrustScoreThreshold()
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<TrustScoreUpdateRequest> entity = new HttpEntity<>(updateRequest, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    "http://localhost:8000/update-trust-score", entity, String.class
+            );
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                System.out.println("Python 응답: " + response.getBody());
+            } else {
+                System.err.println("응답 실패: " + response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            System.err.println("Python 서버 호출 실패: " + e.getMessage());
+        }
+
+
+
 
         return ResponseEntity.ok(new QueryRequest(
                 request.getUserId(),
                 request.getAge(),
-                request.getGender(),
                 request.getFriendType(),
                 request.getPurposes(),
-                request.getInterest(),
-                request.getTaste(),
-                request.getLocation(),
-                request.getAmenity(),
-                request.getPriority()
+                request.getReviewLength(),
+                request.getReviewCountPreference(),
+                request.getPhotoPreference(),
+                request.getRecentnessPreference(),
+                request.getSentimentPreference(),
+                request.getTrustScoreThreshold()
         ));
     }
 
     public ResponseEntity<QuerySelectResponse> getAllQuery(Long userId) {
-        User user = userRepository.findById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Query query = queryRepository.findByUser(user)
@@ -95,14 +130,14 @@ public class QueryService {
         QuerySelectResponse response = new QuerySelectResponse(
                 query.getId(),
                 query.getAge(),
-                query.getGender(),
                 query.getFriendType(),
                 query.getPurposes().stream().map(Purpose::getName).toList(),
-                query.getInterests().stream().map(Interest::getName).toList(),
-                query.getTastes().stream().map(Taste::getName).toList(),
-                query.getLocations().stream().map(Location::getName).toList(),
-                query.getAmenities().stream().map(Amenity::getName).toList(),
-                query.getPriorities()
+                query.getReviewLength(),
+                query.getReviewCountPreference(),
+                query.getPhotoPreference(),
+                query.getRecentnessPreference(),
+                query.getSentimentPreference(),
+                query.getTrustScoreThreshold()
         );
         return ResponseEntity.ok(response);
     }
