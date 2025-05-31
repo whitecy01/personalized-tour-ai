@@ -79,7 +79,7 @@ export default function ChatListScreen() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await axios.get(`http://192.168.1.193:8080/api/chat/${userId}/rooms`);
+        const response = await axios.get(`http://52.78.195.74:8080/api/chat/${userId}/rooms`);
         
         const formattedRooms: Room[] = response.data.map((item: any) => ({
           id: item.id,
@@ -101,7 +101,7 @@ export default function ChatListScreen() {
   // 새로운 채팅방 생성
   const createNewRoom = async () => {
     try {
-      const response = await axios.post(`http://192.168.1.193:8080/api/chat/${userId}`);
+      const response = await axios.post(`http://52.78.195.74:8080/api/chat/${userId}`);
   
       const newRoom: Room = {
         id: response.data.id,

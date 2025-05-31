@@ -24,7 +24,7 @@ export default function QueryHistoryScreen() {
     const fetchQueryHistory = async () => {
       try {
         const response = await axios.get<QueryResponse>(
-          `http://192.168.1.193:8080/queries/${userId}`
+          `http://52.78.195.74:8080/queries/${userId}`
         );
         console.log(response.data)
         setQueryData(response.data);

@@ -101,7 +101,8 @@ public class ChatService {
 
         // Python API 호출
         ResponseEntity<Map> responseEntity = restTemplate.exchange(
-                "http://localhost:8000/llm-recommend",  // Python 서버 주소
+//                "http://localhost:8000/llm-recommend",  // Python 서버 주소
+                "http://fastapi-server:8000/llm-recommend",
                 HttpMethod.POST,
                 entity,
                 Map.class

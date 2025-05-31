@@ -87,10 +87,12 @@ public class QueryService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<TrustScoreUpdateRequest> entity = new HttpEntity<>(updateRequest, headers);
-
+        System.out.println("API 요청 전");
         try {
+            System.out.println("API 요청");
             ResponseEntity<String> response = restTemplate.postForEntity(
-                    "http://localhost:8000/update-trust-score", entity, String.class
+//                    "http://fastapi:8000/update-trust-score",
+                    "http://fastapi-server:8000/update-trust-score", entity, String.class
             );
 
             if (response.getStatusCode().is2xxSuccessful()) {

@@ -196,7 +196,7 @@ export default function NewQueryScreen() {
 
           console.log(requestBody);
           try {
-            const response = await axios.post('http://192.168.1.193:8080/queries/create', requestBody);
+            const response = await axios.post('http://52.78.195.74:8080/queries/create', requestBody);
             console.log('서버 응답:', response.data);
             alert('저장이 완료되었습니다!');
           } catch (error) {

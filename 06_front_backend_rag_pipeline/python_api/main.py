@@ -10,6 +10,9 @@ from dotenv import load_dotenv
 import os
 from more_itertools import chunked  # pip install more-itertools
 
+import torch
+
+
 # .env 파일 로드
 load_dotenv()
 
@@ -19,13 +22,26 @@ api_key = os.getenv("OPENAI_API_KEY")
 # OpenAI 클라이언트 생성 (최신 API 방식)
 client = openai.OpenAI(api_key=api_key) 
 
-model = SentenceTransformer("intfloat/multilingual-e5-base")
+# model = SentenceTransformer("intfloat/multilingual-e5-base")
+model = SentenceTransformer("intfloat/multilingual-e5-base", device="cuda")  # 반드시 명시
 
 app = FastAPI()
 
+@app.on_event("startup")
+async def startup_event():
+    import torch
+    print("======== FastAPI 서버 시작됨 ========")
+    print("CUDA 사용 가능 여부:", torch.cuda.is_available())
+    if torch.cuda.is_available():
+        print("CUDA 디바이스 개수:", torch.cuda.device_count())
+        print("CUDA 디바이스 이름:", torch.cuda.get_device_name(0))
+    else:
+        print("⚠️ GPU(CUDA)를 사용할 수 없습니다. CPU 모드로 동작합니다.")
 
-CSV_PATH = "/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/All_reviews_04_trust_score_V2.csv"
-CHROMA_PATH = "/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/05_vector_db/chroma_storageV2"
+# CSV_PATH = "/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/All_reviews_04_trust_score_V2.csv"
+# CHROMA_PATH = "/Users/jeongjaeyoon/Documents/GitHub/personalized-tour-ai/05_vector_db/chroma_storageV2"
+CSV_PATH = "/app/data/csv/All_reviews_04_trust_score_V2.csv"
+CHROMA_PATH = "/app/data/chroma"
 COLLECTION_NAME = "trusted_reviews"
 
 
@@ -257,7 +273,8 @@ def build_prompt(survey: QuerySelectResponse, reviews: List[str], metadatas: Lis
 @app.post("/llm-recommend")
 def llm_recommend(data: RequestData):
     # VectorDB 연결
-    chroma_client = chromadb.PersistentClient(path="../../05_vector_db/chroma_storage")
+    # chroma_client = chromadb.PersistentClient(path="../../05_vector_db/chroma_storage")
+    chroma_client = chromadb.PersistentClient(path="/app/data/chroma")
     print("컬렉션 목록:", chroma_client.list_collections())
     collection = chroma_client.get_collection(name="trusted_reviews")
 
