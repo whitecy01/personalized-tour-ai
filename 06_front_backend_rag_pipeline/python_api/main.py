@@ -272,6 +272,18 @@ def build_prompt(survey: QuerySelectResponse, reviews: List[str], metadatas: Lis
 # LLM 추천 API 엔드포인트
 @app.post("/llm-recommend")
 def llm_recommend(data: RequestData):
+    EN_TO_KO_PURPOSE = {
+        'Relaxation': '휴식',
+        'Cultural Experience': '문화체험',
+        'Food Tour': '맛집탐방',
+        'Shopping': '쇼핑',
+        'Photography': '사진',
+        'Healing': '힐링'
+    }
+    # 목적 영어 → 한글 변환
+    converted_purposes = [EN_TO_KO_PURPOSE.get(p, p) for p in data.survey.purposes]
+    data.survey.purposes = converted_purposes
+    print(data.survey.purposes)
     # VectorDB 연결
     # chroma_client = chromadb.PersistentClient(path="../../05_vector_db/chroma_storage")
     chroma_client = chromadb.PersistentClient(path="/app/data/chroma")

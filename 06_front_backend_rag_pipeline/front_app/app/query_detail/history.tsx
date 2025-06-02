@@ -14,11 +14,21 @@ type QueryResponse = {
   trustScoreThreshold: number;
   purposes: string[];
 };
+const EN_TO_KO_PURPOSE: { [key: string]: string } = {
+  'Relaxation': '휴식',
+  'Cultural Experience': '문화체험',
+  'Food Tour': '맛집탐방',
+  'Shopping': '쇼핑',
+  'Photography': '사진',
+  'Healing': '힐링',
+};
+
 
 export default function QueryHistoryScreen() {
   const [queryData, setQueryData] = useState<QueryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const userId = 1; // 예: 로그인된 사용자 ID
+  
 
   useEffect(() => {
     const fetchQueryHistory = async () => {
@@ -27,6 +37,7 @@ export default function QueryHistoryScreen() {
           `http://52.78.195.74:8080/queries/${userId}`
         );
         console.log(response.data)
+
         setQueryData(response.data);
       } catch (error) {
         console.error('데이터 불러오기 실패:', error);
@@ -107,14 +118,30 @@ export default function QueryHistoryScreen() {
 }
 
 function Section({ title, data }: { title: string; data: string[] }) {
-  return (
+  const translated = data.map(item => EN_TO_KO_PURPOSE[item] || item);
+
+  // return (
+  //   <View style={styles.section}>
+  //     <Text style={styles.sectionTitle}>{title}</Text>
+  //     {data.length === 0 ? (
+  //       <Text>선택 없음</Text>
+  //     ) : (
+  //       <FlatList
+  //         data={data}
+  //         keyExtractor={(item, index) => `${item}-${index}`}
+  //         renderItem={({ item }) => <Text>- {item}</Text>}
+  //       />
+  //     )}
+  //   </View>
+  // );
+    return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
-      {data.length === 0 ? (
+      {translated.length === 0 ? (
         <Text>선택 없음</Text>
       ) : (
         <FlatList
-          data={data}
+          data={translated}
           keyExtractor={(item, index) => `${item}-${index}`}
           renderItem={({ item }) => <Text>- {item}</Text>}
         />

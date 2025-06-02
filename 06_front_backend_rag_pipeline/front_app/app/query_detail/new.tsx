@@ -1,13 +1,16 @@
-import { View, Text, ScrollView, StyleSheet, Button, TextInput } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Button, TextInput, ActivityIndicator} from 'react-native';
 import { useState } from 'react';
 import DropdownSelector from '../../components/DropdownSelector';
 import PickerModal from '../../components/PickerModal';
 import { TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
+
 type CheckItemMap = { [key: string]: boolean };
 
 export default function NewQueryScreen() {
+
+
   const [checkedItems, setCheckedItems] = useState<CheckItemMap>({});
   const [selectedAge, setSelectedAge] = useState('40대');
   const [ageModalVisible, setAgeModalVisible] = useState(false);
@@ -32,6 +35,13 @@ export default function NewQueryScreen() {
   //선택지(리뷰 신뢰 점수 기준)
   const [trustScoreThresholdPref, setTrustScoreThresholdPref] = useState<number>();
 
+  //스피너
+  const [loading, setLoading] = useState(false);
+
+  //모든 값
+  const [validationModalVisible, setValidationModalVisible] = useState(false);
+  const [validationMessage, setValidationMessage] = useState('');
+
   
   const toggleCheck = (key: string) => {
     setCheckedItems((prev) => ({
@@ -42,6 +52,7 @@ export default function NewQueryScreen() {
 
 
   return (
+    <>
     <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}>
       <Text style={styles.sectionTitle}>1. 기본 정보를 입력해주세요</Text>
       <View style={styles.row}>
@@ -177,6 +188,69 @@ export default function NewQueryScreen() {
 
       {/* 완료 버튼 */}
       <TouchableOpacity
+        disabled={loading}
+        style={[styles.customButton, loading && { opacity: 0.5 }]}
+        onPress={async () => {
+            if (!reviewLengthPref || !reviewCountPreferencePref || !photoPreferencePref || !recentnessPreferencePref || !sentimentPreferencePref || !trustScoreThresholdPref) {
+              setValidationMessage("모든 질문 항목을 선택해주세요.");
+              setValidationModalVisible(true);
+              return;
+            }
+
+            // if (!reviewLengthPref || !reviewCountPreferencePref || !photoPreferencePref || !recentnessPreferencePref || !sentimentPreferencePref || !trustScoreThresholdPref) {
+            //   alert("모든 질문 항목을 선택해주세요.");
+            //   return;
+            // }
+
+        const purposeMap: Record<string, string> = {
+          휴식: 'Relaxation',
+          문화체험: 'Cultural Experience',
+          맛집탐방: 'Food Tour',
+          쇼핑: 'Shopping',
+          사진: 'Photography',
+          힐링: 'Healing',
+        };
+
+          // const selectedPurposes = Object.keys(checkedItems).filter((key) => checkedItems[key]);
+          const selectedPurposes = Object.keys(checkedItems)
+            .filter((key) => checkedItems[key])
+            .map((korean) => purposeMap[korean] || korean);  // 매핑이 
+          
+          console.log(selectedPurposes);
+          const requestBody = {
+            userId: 1,
+            age: selectedAge,
+            friendType: selectedfrined,
+            purposes: selectedPurposes,
+            reviewLength: reviewLengthPref || 0,
+            reviewCountPreference: reviewCountPreferencePref || 0,
+            photoPreference: photoPreferencePref || 0,
+            recentnessPreference: recentnessPreferencePref || 0,
+            sentimentPreference: sentimentPreferencePref || 0,
+            trustScoreThreshold: trustScoreThresholdPref || 0
+          };
+          console.log(requestBody.purposes);
+
+          setLoading(true); // 로딩 시작
+          try {
+            const response = await axios.post('http://52.78.195.74:8080/queries/create', requestBody);
+            console.log('서버 응답:', response.data);
+            alert('저장이 완료되었습니다!');
+          } catch (error) {
+            console.error('저장 중 오류 발생:', error);
+            alert('저장 중 오류가 발생했습니다.');
+          } finally {
+            setLoading(false); // 로딩 종료
+          }
+        }}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>완료</Text>
+        )}
+      </TouchableOpacity>
+      {/* <TouchableOpacity
         style={styles.customButton}
         onPress={async () => {
           const selectedPurposes = Object.keys(checkedItems).filter((key) => checkedItems[key]);
@@ -206,12 +280,33 @@ export default function NewQueryScreen() {
         }}
       >
         <Text style={styles.customButtonText}>완료</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <PickerModal visible={ageModalVisible} selectedValue={selectedAge} onValueChange={setSelectedAge} onClose={() => setAgeModalVisible(false)} items={['10대', '20대', '30대', '40대', '50대 이상']} />
       {/* <PickerModal visible={genderModalVisible} selectedValue={selectedGender} onValueChange={setSelectedGender} onClose={() => setGenderModalVisible(false)} items={['남', '여', '기타']} /> */}
       <PickerModal visible={friendModalVisible} selectedValue={selectedfrined} onValueChange={setSelectedfrined} onClose={() => setfriendModalVisible(false)} items={['혼자', '친구', '연인', '가족', '아이 동반']} />
     </ScrollView>
+      {loading && (
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.modalText}>리뷰 데이터를 최적화 중입니다.{'\n'}시간이 다소 소요될 수 있습니다.</Text>
+        </View>
+      </View>
+    )}
+
+    {validationModalVisible && (
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalText}>{validationMessage}</Text>
+          <TouchableOpacity onPress={() => setValidationModalVisible(false)} style={styles.customButton}>
+            <Text style={styles.buttonText}>확인</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )}
+
+  </>
   );
 }
 
@@ -226,11 +321,55 @@ const styles = StyleSheet.create({
   circle: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#ccc', justifyContent: 'center', alignItems: 'center', marginRight: 5 },
   circleChecked: { borderColor: '#007bff', backgroundColor: '#007bff' },
   circleLabel: { fontSize: 14 },
-  customButton: { backgroundColor: '#7dbdf5', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, alignItems: 'center', width: '100%', marginTop: 3 },
+  // customButton: { backgroundColor: '#7dbdf5', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, alignItems: 'center', width: '100%', marginTop: 3 },
   customButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   subNote: { fontSize: 12, color: '#888', marginBottom: 5 },
   radioGroup: { marginVertical: 8 },
   radioItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   radioCircle: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: '#ccc', marginRight: 8 },
   radioCircleSelected: { borderColor: '#007bff', backgroundColor: '#007bff' },
+
+
+  customButton: {
+    backgroundColor: '#007AFF',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 25,
+    borderRadius: 12,
+    alignItems: 'center',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  modalText: {
+    marginTop: 15,
+    fontSize: 15,
+    textAlign: 'center',
+    color: '#333',
+  },
+  
+  
 });

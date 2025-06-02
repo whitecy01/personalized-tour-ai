@@ -47,9 +47,17 @@ public class QueryService {
         query.setTrustScoreThreshold(request.getTrustScoreThreshold());
 
         // 1. 여행 목적
+        if (query.getPurposes() != null) {
+            query.getPurposes().clear();  // 중간 테이블 데이터 제거
+        }
+        
         List<Purpose> purposes = purposeRepository.findByNameIn(request.getPurposes());
-        query.setPurposes(purposes);
+        System.out.println("입력값 : " + request.getPurposes());
+        System.out.println("조회된 목적 수: " + purposes.size());
+        System.out.println("조회된 목적 목록: " + purposes);
 
+        query.setPurposes(purposes);
+        System.out.println("목적 : " + purposes);
         queryRepository.save(query);
 
         // Python 서버에 요청
