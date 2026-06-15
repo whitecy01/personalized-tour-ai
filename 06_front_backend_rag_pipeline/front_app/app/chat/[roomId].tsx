@@ -74,7 +74,7 @@ export default function ChatRoomScreen() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(`http://192.168.1.193:8080/api/chat/${roomId}`);
+        const response = await axios.get(`http://52.78.195.74:8080/api/chat/${roomId}`);
         const loadedMessages = response.data.map((msg: any) => ({
           id: msg.id.toString(),
           text: msg.message,
@@ -97,7 +97,7 @@ export default function ChatRoomScreen() {
     if (inputText.trim() === '') return;
 
     try {
-      const response = await axios.post(`http://192.168.1.193:8080/api/chat/send`, {
+      const response = await axios.post(`http://52.78.195.74:8080/api/chat/send`, {
         roomId: Number(roomId),
         userId: userId,
         message: inputText,

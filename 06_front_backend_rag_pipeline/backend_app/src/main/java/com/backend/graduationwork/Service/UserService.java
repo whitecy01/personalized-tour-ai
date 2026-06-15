@@ -1,6 +1,6 @@
 package com.backend.graduationwork.Service;
 
-import com.backend.graduationwork.Entity.User;
+import com.backend.graduationwork.Entity.Users;
 import com.backend.graduationwork.Repository.UserRepository;
 import com.backend.graduationwork.RequestDto.SignupRequest;
 import com.backend.graduationwork.ResponseDto.MessageResponse;
@@ -19,7 +19,7 @@ public class UserService {
     private UserRepository userRepository;
 
     public ResponseEntity<UserResponse> Signup(@RequestBody SignupRequest signupRequest){
-        User user = User.of(signupRequest.getUserId(), signupRequest.getPassword());
+        Users user = Users.of(signupRequest.getUserId(), signupRequest.getPassword());
         userRepository.save(user);
 
         UserResponse userResponse = new UserResponse(user.getId(), user.getUserId(), user.getPassword());
@@ -27,13 +27,13 @@ public class UserService {
     }
 
     public ResponseEntity<Object> Signin(@RequestBody SignupRequest signupRequest){
-        Optional<User> optionalUser = userRepository.findByUserIdAndPassword(
+        Optional<Users> optionalUser = userRepository.findByUserIdAndPassword(
                 signupRequest.getUserId(),
                 signupRequest.getPassword()
         );
 
         if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
+            Users user = optionalUser.get();
             UserResponse response = new UserResponse(user.getId(), user.getUserId(), user.getPassword());
             return ResponseEntity.ok(response);
         }
