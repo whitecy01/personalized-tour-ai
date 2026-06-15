@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pandas
+openai
+python-dotenv
+sentence-transformers
+chromadb
+more-itertools

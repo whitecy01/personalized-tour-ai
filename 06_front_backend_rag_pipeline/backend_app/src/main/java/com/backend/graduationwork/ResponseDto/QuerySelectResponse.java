@@ -12,14 +12,14 @@ import java.util.List;
 public class QuerySelectResponse {
     private Long queryId;
     private String age;
-    private String gender;
     private String friendType;
     private List<String> purposes;
-    private List<String> interests;
-    private List<String> tastes;
-    private List<String> locations;
-    private List<String> amenities;
-    private String priorities;
+    private Long reviewLength;
+    private Long reviewCountPreference;
+    private Long photoPreference;
+    private Long recentnessPreference;
+    private Long sentimentPreference;
+    private double trustScoreThreshold;
 
     // 생성자, getter, setter 작성
 }

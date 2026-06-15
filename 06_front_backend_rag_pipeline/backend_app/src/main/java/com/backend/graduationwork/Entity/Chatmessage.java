@@ -32,7 +32,7 @@ public class Chatmessage {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;  // 메시지 보낸 사용자
+    private Users user;  // 메시지 보낸 사용자
 
 
 }
