@@ -68,27 +68,19 @@
 
 ```mermaid
 flowchart LR
-    subgraph CLIENT["📱 Front (Expo)"]
-        A1[사전 질의 설문]
-        A2[채팅 추천]
-    end
-    subgraph BACK["☕ Backend (Spring Boot)"]
-        B1[설문 저장 / 가중치 정규화]
-        B2[메시지 중계]
-        DB[(MySQL)]
-    end
-    subgraph AI["🐍 AI Server (FastAPI · GPU)"]
-        C1[trust_score 재계산]
-        C2[RAG 검색 + GPT-3.5]
-        VDB[(ChromaDB)]
-    end
+    User([👥 사용자]) --> Query[📋 사전질의]
+    Query -- 나이·동행유형·목적 --> MySQL[(🗄️ MySQL)]
+    Query -- trust_score 갱신<br/>신뢰 리뷰만 선별·저장 --> VDB[(🔍 VectorDB)]
+    Query --> Ask[💬 사용자 질의 입력] --> RAG{{🧠 RAG}}
 
-    A1 --> B1 --> C1 --> VDB
-    A2 --> B2 --> C2
-    C2 -.유사 신뢰 리뷰.-> VDB
-    C2 -.추천 응답.-> A2
-    B1 <--> DB
+    Review[📄 리뷰 데이터] -- 신뢰성 필터링 + 감정분석<br/>KLUE-RoBERTa · 점수 벡터화 --> VDB
+
+    MySQL --> RAG
+    VDB --> RAG
+    RAG --> LLM[🤖 LLM<br/>GPT-3.5-turbo] --> Rec([👍 개인화 추천])
 ```
+
+> 📱 구현 관점: **Expo(앱) ↔ Spring Boot(중계·MySQL 저장) ↔ FastAPI(RAG·LLM·VectorDB, EC2 GPU)** 3-tier 컨테이너로 구성
 
 ### 동작 흐름 2가지
 
